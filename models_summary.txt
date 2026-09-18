@@ -1,0 +1,359 @@
+Class: Collection
+Attributes:
+  # $table = 'existing_design'
+  # $primaryKey = 'collectID' <--- PK
+  + $timestamps = false
+  # collectName (string, 50)
+  # collectPrice (integer)
+  # collectFilePath (string, 255)
+  # archived (boolean, default false)
+Methods:
+  + orders()
+  + findOrFail()
+  + collectPrice
+
+---
+Class: Conversation
+Attributes:
+  # $table = 'conversations'
+  # $primaryKey = 'convoID' <--- PK
+  + $timestamps = false
+  # messID (unsignedBigInteger, nullable)
+  # user_id (unsignedBigInteger) <--- FK
+  # assigned_employee (unsignedBigInteger) <--- FK
+  # $dispatchesEvents
+Methods:
+  + user()
+  + messages()
+  + latestMessage()
+  + order()
+  + orders()
+  + assignedEmployee()
+  + create()
+  + save()
+  + where()
+  + whereNotNull()
+  + whereDoesntHave()
+  + orderByDesc()
+  + first()
+
+---
+Class: CustomOrder
+Traits:
+  + HasFactory
+Attributes:
+  # $table = 'custom_orders'
+  # $primaryKey = 'customID' <--- PK
+  + $timestamps = false
+  # colors (json)
+  # text (json, nullable)
+  # customQuantity (integer)
+  # totalAmount (decimal, 10, 2, default 0.00)
+  # fabricID (unsignedBigInteger) <--- FK
+  # timeframeID (unsignedBigInteger, nullable) <--- FK
+  # user_id (unsignedBigInteger) <--- FK
+  # $casts:
+    - colors
+    - text
+Methods:
+  + sizes()
+  + user()
+  + orders()
+  + fabric()
+  + timeframe()
+  + with()
+  + findOrFail()
+  + create()
+  + attach()
+  + where()
+  + orderBy()
+  + first()
+  + uploadOrder
+
+---
+Class: Fabric
+Traits:
+  + HasFactory
+Attributes:
+  # $primaryKey = 'fabricID' <--- PK
+  + $timestamps = false
+  # $table = 'fabrics'
+  # fabricName (string)
+  # fabricPrice (decimal, 10, 2)
+  # is_custom (boolean, default false)
+  # archived (boolean, default false)
+Methods:
+  + uploadOrders()
+  + customOrders()
+  + new Fabric()
+  + save()
+  + find()
+  + where()
+  + first()
+
+---
+Class: Message
+Attributes:
+  # $table = 'messages'
+  # $primaryKey = 'messID' <--- PK
+  # messContent (text)
+  # messDate (datetime)
+  # user_id (unsignedBigInteger) <--- FK
+  # convoID (unsignedBigInteger) <--- FK
+  # created_at (timestamp)
+  # updated_at (timestamp)
+Methods:
+  + user()
+  + conversation()
+  + create()
+  + save()
+  + where()
+  + with()
+  + get()
+
+---
+Class: Order
+Traits:
+  + Notifiable
+Attributes:
+  # $table = 'orders'
+  # $primaryKey = 'orderID' <--- PK
+  + $timestamps = false
+  # orderTotal (decimal, 10, 2)
+  # orderStatus (string, default 'Pending')
+  # orderQuantity (integer)
+  # dateOrder (date)
+  # dateReceived (date, nullable)
+  # user_id (unsignedBigInteger) <--- FK
+  # convoID (unsignedBigInteger) <--- FK
+  # collectID (unsignedBigInteger, nullable) <--- FK
+  # customID (unsignedBigInteger, nullable) <--- FK
+  # upID (unsignedBigInteger, nullable) <--- FK
+Methods:
+  + user()
+  + customOrder()
+  + sizes()
+  + collections()
+  + collection()
+  + uploadOrder()
+  + conversation()
+  + collectionSizes()
+  + getCustomOrderNameAttribute()
+  + create()
+  + collections()
+  + attach()
+  + with()
+  + get()
+  + findOrFail()
+  + find()
+  + save()
+  + delete()
+
+---
+Class: Size
+Traits:
+  + HasFactory
+Attributes:
+  # $table = 'sizes'
+  # $primaryKey = 'sizeID' <--- PK
+  + $timestamps = false
+  # sizeName (string)
+  # sizeQuantity (integer, default 0)
+  # sizePrice (decimal, 10, 2)
+  # archived (boolean, default false)
+Methods:
+  + uploadOrders()
+  + all()
+  + findOrFail()
+  + where()
+  + first()
+
+---
+Class: Timeframe
+Traits:
+  + HasFactory
+Attributes:
+  # $table = 'timeframe'
+  # $primaryKey = 'timeframeID' <--- PK
+  + $timestamps = false
+  # delivery_timeframe (string)
+  # percentageCost (integer)
+  # maximum_orders (integer)
+  # archived (boolean, default false)
+Methods:
+  + find()
+
+---
+Class: UploadOrder
+Attributes:
+  # $table = 'upload_orders'
+  # $primaryKey = 'upID' <--- PK
+  + $timestamps = false
+  # upName (string, 255)
+  # upQuantity (integer)
+  # fabricID (unsignedBigInteger) <--- FK
+  # upAmount (decimal, 10, 2)
+  # user_id (unsignedBigInteger) <--- FK
+Methods:
+  + sizes()
+  + user()
+  + fabric()
+  + new UploadOrder()
+  + save()
+  + sizes()
+  + attach()
+
+---
+Class: User
+Traits:
+  + Notifiable
+Attributes:
+  # $primaryKey = 'user_id' <--- PK
+  + $timestamps = false
+  # $table = 'users'
+  # user_id (id)
+  # first_name (string)
+  # last_name (string)
+  # email (string, unique)
+  # password (string)
+  # role (string, default 'customer')
+  # sex (string, enum 'Male', 'Female', 'Other')
+  # bday (date)
+  # contact (string)
+  # address (string)
+  # archived (boolean, default false)
+  # $hidden:
+    - password
+    - remember_token
+Methods:
+  + isAdmin()
+  + isEmployee()
+  + isCustomer()
+  + notifications()
+  + conversations()
+  + fullCustomerName()
+  + getFullCustomerNameAttribute()
+  + orders()
+  + getFullName()
+  + where()
+  + inRandomOrder()
+  + first()
+  + find()
+  + fill()
+  + isDirty()
+  + save()
+  + delete()
+  + email_verified_at
+
+---
+Controller: ManageOrderController
+Methods:
+  + index()
+  + show($id)
+  + edit($id)
+  + update(Request $request, $orderId)
+  + destroy($id)
+
+---
+Controller: AdminController
+Methods:
+  + updateSizes(Request $request)
+
+---
+Controller: adminFeedController
+Methods:
+  + index()
+
+---
+Controller: AdminOrderController
+Methods:
+  + edit($id)
+  + update(Request $request, $orderId)
+  + destroy($id)
+  + show($id)
+
+---
+Controller: BillingStatementController
+Methods:
+  + generate(Order $order)
+  - getCollectionOrderData(Order $order)
+
+---
+Controller: CollectionOrderController
+Methods:
+  + store(Request $request)
+
+---
+Controller: CustomOrderController
+Methods:
+  + customize(Request $request)
+  + previewOrder($id)
+  + generateQRCode(Request $request)
+  + sendQRCodeToEmployee(Request $request)
+  + downloadQRCode($customID)
+  + generateBillingStatement(Request $request)
+
+---
+Controller: FAQController
+Methods:
+  + askSupport()
+
+---
+Controller: OrderDetailsController
+Methods:
+  + showOrderDetails($orderId)
+
+---
+Controller: UploadOrderController
+Methods:
+  + uploadDesignAndSendMessage(Request $request)
+
+---
+Controller: ViewOrderController
+Methods:
+  + viewOrders()
+
+---
+Controller: AssistCustomerController
+Methods:
+  + listConversations()
+  + showConversations()
+  + showChat($convoID)
+
+---
+Controller: EmployeeController
+Methods:
+  + showEmpDboard()
+  + showEmpManageOrder()
+  + edit($id)
+  + update(Request $request, $orderId)
+  + destroy($id)
+  + show($id)
+
+---
+Controller: ChatController
+Methods:
+  + sendMessage(Request $request)
+  + getMessages($conversationId)
+  + showChat($convoID)
+  + sendImage(Request $request)
+
+---
+Controller: CustomerProfileController
+Methods:
+  + index()
+
+---
+Controller: LoginController
+Methods:
+  + index(Request $request)
+  + login(Request $request)
+  + edit(Request $request)
+  + logout(Request $request)
+
+---
+Controller: ProfileController
+Methods:
+  + edit(Request $request)
+  + update(ProfileUpdateRequest $request)
+  + destroy(Request $request)
